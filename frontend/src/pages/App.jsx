@@ -4,7 +4,9 @@ import api from '../services/api';
 const initialCheckin = { expected_action: '', done: true, reason: '' };
 
 export default function App() {
+  const [mode, setMode] = useState('login');
   const [token, setToken] = useState(localStorage.getItem('token') || '');
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [checkin, setCheckin] = useState(initialCheckin);
@@ -18,6 +20,18 @@ export default function App() {
     const { data } = await api.post('/auth/login', { email, password });
     localStorage.setItem('token', data.token);
     setToken(data.token);
+    setFeedback('Sesión iniciada. Ejecuta tu check-in.');
+  };
+
+  const register = async () => {
+    await api.post('/auth/register', { name, email, password });
+    setMode('login');
+    setFeedback('Cuenta creada. Ahora inicia sesión.');
+  };
+
+  const recover = async () => {
+    const { data } = await api.post('/auth/recover', { email });
+    setFeedback(data.message);
   };
 
   const submitCheckin = async () => {
@@ -32,7 +46,23 @@ export default function App() {
   };
 
   if (!token) {
-    return <main className="shell"><h1>Accountability Partner</h1><input placeholder="email" onChange={(e)=>setEmail(e.target.value)} /><input placeholder="password" type="password" onChange={(e)=>setPassword(e.target.value)} /><button onClick={login}>Entrar</button></main>;
+    return (
+      <main className="shell">
+        <h1>Accountability Partner</h1>
+        {mode === 'register' && <input placeholder="name" onChange={(e) => setName(e.target.value)} />}
+        <input placeholder="email" onChange={(e) => setEmail(e.target.value)} />
+        {mode !== 'recover' && <input placeholder="password" type="password" onChange={(e) => setPassword(e.target.value)} />}
+        {mode === 'login' && <button onClick={login}>Entrar</button>}
+        {mode === 'register' && <button onClick={register}>Crear cuenta</button>}
+        {mode === 'recover' && <button onClick={recover}>Recuperar contraseña</button>}
+        <div>
+          <button onClick={() => setMode('login')}>Login</button>
+          <button onClick={() => setMode('register')}>Registro</button>
+          <button onClick={() => setMode('recover')}>Recuperación</button>
+        </div>
+        <p>{feedback}</p>
+      </main>
+    );
   }
 
   if (!checkedToday) {
