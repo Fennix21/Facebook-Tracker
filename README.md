@@ -9,6 +9,11 @@ Aplicación full-stack para cerrar la brecha entre intención y ejecución media
 - Orquestación: Docker Compose
 
 ## Arranque en 1 comando (recomendado)
+
+## Inicio con doble clic (Windows)
+- Haz doble clic en `START_WINDOWS.bat`.
+- El script valida Docker y ejecuta `docker compose up --build` automáticamente.
+
 1. Tener Docker Desktop abierto.
 2. Desde la raíz del proyecto ejecutar:
    ```bash
